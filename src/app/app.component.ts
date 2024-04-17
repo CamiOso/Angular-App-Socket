@@ -3,7 +3,7 @@ import { WebsocketService } from './services/websocket.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
+  templateUrl:'./app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   ngOnInit(){
 
 
-    
+
 
   }
 
