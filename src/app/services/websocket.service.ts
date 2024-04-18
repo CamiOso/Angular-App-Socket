@@ -24,7 +24,14 @@ export class WebsocketService {
   console.log("Desconectado del  Servidor");
   this.socketStatus=false;
  });
+  }
 
+
+  emit(evento:string,payload?:any,callback?:Function){
+
+    console.log("Emitiendo",evento);
+
+  this.socket.emit(evento,payload,callback);
 
   }
 }
