@@ -1,9 +1,29 @@
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+import {
+    ActivatedRouteSnapshot,
+    CanActivateFn,
+    Router,
+    RouterStateSnapshot,
+    UrlSegment,
+} from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class UsuarioGuardService {
+import { WebsocketService } from '../services/websocket.service';
 
-  constructor() { }
+export const canActivateGuard: CanActivateFn = (
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+) => {
+
+    const authService: WebsocketService | undefined = inject(WebsocketService);
+    const router: Router | undefined = inject(Router);
+
+    if (authService && authService.getUsuario()) {
+        return true;
+    } else {
+        if (router) {
+            router.navigateByUrl('/');
+        }
+        return false;
+    }
 }

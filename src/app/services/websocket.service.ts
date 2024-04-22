@@ -73,4 +73,11 @@ cargarStorage(){
     this.loginWs(this.usuario.nombre);
   }
 }
+
+
+ getUsuario(){
+    return this.usuario;
+ }
+
+
 }
