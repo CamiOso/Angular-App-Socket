@@ -11,6 +11,7 @@ export class WebsocketService {
   public usuario!:Usuario;
 
   constructor(private socket:Socket ) {
+    this.cargarStorage();
     this.checkStatus();
   }
 
@@ -45,11 +46,31 @@ export class WebsocketService {
   loginWs(nombre:string){
 
     console.log("Configurando",nombre);
+    return new Promise<void>((resolve,reject)=>{
 
-    this.socket.emit('configurar-usuario',{nombre},(resp: any)=>{
-      console.log(resp);
+    this.emit('configurar-usuario',{nombre},(resp: any)=>{
+      this.usuario=new Usuario(nombre);
+      this.guardarStorage();
+      resolve();
 
   });
 
+    });
+
+
+}
+
+
+
+guardarStorage(){
+localStorage.setItem('usuario',JSON.stringify(this.usuario));
+}
+
+cargarStorage(){
+  const usuarioString = localStorage.getItem('usuario');
+  if (usuarioString !== null) {
+    this.usuario = JSON.parse(usuarioString);
+    this.loginWs(this.usuario.nombre);
+  }
 }
 }
