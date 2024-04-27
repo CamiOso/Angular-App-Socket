@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Usuario } from '../clases/usuario';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +9,11 @@ import { Usuario } from '../clases/usuario';
 export class WebsocketService {
 
   public socketStatus=false;
-  public usuario!:Usuario;
+  public usuario!:Usuario | null;
 
-  constructor(private socket:Socket ) {
+  constructor(private socket:Socket,
+    private router:Router
+   ) {
     this.cargarStorage();
     this.checkStatus();
   }
@@ -19,6 +22,7 @@ export class WebsocketService {
  this.socket.on('connect',()=>{
   console.log("Conectado al Servidor");
   this.socketStatus=true;
+  this.cargarStorage();
  });
 
 
@@ -65,12 +69,20 @@ export class WebsocketService {
 guardarStorage(){
 localStorage.setItem('usuario',JSON.stringify(this.usuario));
 }
-
-cargarStorage(){
+cargarStorage() {
   const usuarioString = localStorage.getItem('usuario');
   if (usuarioString !== null) {
-    this.usuario = JSON.parse(usuarioString);
-    this.loginWs(this.usuario.nombre);
+    const usuario = JSON.parse(usuarioString);
+    if (usuario && usuario.nombre) {
+      this.usuario = usuario;
+      this.loginWs(usuario.nombre);
+    } else {
+      // Aquí puedes manejar el caso en que el usuario almacenado en localStorage no tenga el formato esperado
+      console.error('El usuario almacenado en el localStorage no tiene el formato esperado.');
+    }
+  } else {
+    // Aquí puedes manejar el caso en que no hay usuario almacenado en localStorage
+    console.log('No se encontró ningún usuario en el localStorage.');
   }
 }
 
@@ -78,6 +90,28 @@ cargarStorage(){
  getUsuario(){
     return this.usuario;
  }
+
+
+ logoutWs() {
+  // Asignar null a this.usuario
+  if (this.usuario !== null) {
+    this.usuario = null;
+}
+
+  // Remover 'usuario' del localStorage
+  localStorage.removeItem('usuario');
+
+  // Emitir evento 'configurar-usuario' con payload
+  const payload = {
+      nombre: 'sin-nombre'
+  };
+  this.emit('configurar-usuario', payload,()=>{
+    
+  });
+
+  // Navegar a la ruta vacía
+  this.router.navigateByUrl('');
+}
 
 
 }
